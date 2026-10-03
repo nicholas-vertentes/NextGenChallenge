@@ -1,4 +1,5 @@
 import { PortfolioHoldings } from "@/components/portfolio-holdings";
+import { PortfolioAllocation } from "@/components/portfolio-allocation";
 
 export default async function Home(props: PageProps<"/">) {
   const { scenario } = await props.searchParams;
@@ -17,6 +18,14 @@ export default async function Home(props: PageProps<"/">) {
         className="mt-6 rounded-lg border border-dashed border-zinc-300 bg-white p-6 text-sm text-zinc-500"
       >
         Portfolio summary will appear here.
+      </section>
+
+      <section
+        aria-label="Asset allocation"
+        className="mt-6 flex flex-col gap-3"
+      >
+        <h3 className="text-lg font-semibold text-zinc-900">Asset Allocation</h3>
+        <PortfolioAllocation accountId="P-9001" scenario={normalizedScenario} />
       </section>
 
       <section aria-label="Holdings" className="mt-6 flex flex-col gap-3">

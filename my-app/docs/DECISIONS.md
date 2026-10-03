@@ -106,3 +106,63 @@ and reference its ID.
   | Gain/loss positive vs negative vs zero | green / red / neutral styling by sign; CASH (0) neutral | `components/holdings-table.tsx` | P-9001: AAPL/ALT green, BND/TSLA red, CASH neutral |
   | Repeated sort clicks toggle asc/desc | Header click toggles direction; new column starts desc | `components/holdings-table.tsx` | Manual: click each header twice |
   | Fewer rows than columns (2-3 holdings) | Table renders normally with 2 rows | `components/holdings-table.tsx` | `/?scenario=few-holdings` |
+
+---
+
+## D-003: Portfolio summary card (container/presentational split, sign styling)
+- Task: 2. Portfolio Summary Card
+- Date: 2026-10-03
+- Status: accepted
+- Context: The overview page still showed a dashed "Portfolio summary will
+  appear here" placeholder (D-001). The summary needs total market value,
+  day change as both amount and percent, and total return since inception,
+  with positive / negative / zero visually distinguished.
+- Decision: Mirror the Task 3 structure: a client container
+  `PortfolioSummary` fetches through the existing `usePortfolio` hook and owns
+  the loading / error states, and a presentational `PortfolioSummaryCard`
+  receives the four figures plus `currency` as props and holds no state.
+  Three stats in a responsive `<dl>` grid (1 / 2 / 3 columns). Sign styling
+  reuses the holdings table's palette: emerald for positive, red for negative,
+  zinc for zero, plus a ▲ / ▼ / – icon on the day change. Three new helpers in
+  `lib/format.ts`: `formatSignedCurrency`, `formatSignedPercent`, and
+  `formatRatioAsPercent`.
+- Alternatives considered:
+  - Lift the fetch into a shared parent and pass data to both the summary and
+    the holdings table: avoids the duplicate request, but restructures working
+    Task 3 code now instead of when Tasks 7/8 force it. Not chosen.
+  - Pass the whole `PortfolioSummary` object as one prop: fewer props, but the
+    card would depend on API-shaped data rather than plain display values.
+    Not chosen.
+  - Sign the total return as well (`+18.7%`): consistent with the day change,
+    but the spec example shows `18.7%`. Not chosen; colour alone marks it.
+  - Hand-written `+`/`-` prefixes on currency: `Intl` `signDisplay:
+    "exceptZero"` keeps formatting in one place per the money convention.
+- Reasoning: The container/presentational split matches the existing pattern,
+  keeps the card trivially reusable and re-renderable from props, and leaves
+  the Task 7 currency conversion a single place to plug into (the container).
+  Known trade-off: the summary and the holdings table each fetch the same
+  portfolio URL, so the page issues two identical requests. Accepted for now
+  because Tasks 7 and 8 will centralize account/currency state anyway; a
+  superseding entry should record that change.
+- Decided by: agent recommendation (no design questions asked; the task brief
+  specified props-driven, reusable, and the existing conventions covered the
+  rest).
+- Assumptions:
+  - `dayChangePercent` is already a percent (0.61 = 0.61%) while
+    `totalReturnSinceInception` is a decimal ratio (0.187 = 18.7%), per
+    `support/PORTFOLIO-API.md`. Formatted per field, never a blanket ×100.
+  - Values stay native CAD; the currency code is shown in the
+    "Total Market Value (CAD)" label and comes from the API, so the Task 7
+    toggle only needs to change the props.
+  - Zero renders unsigned (`$0.00`, `0.00%`) so it does not read as a gain.
+- Edge cases:
+  | Case (from spec or discovered) | How it's handled | Where (file) | Verified how |
+  | --- | --- | --- | --- |
+  | Zero day change must be neutral | `toneOf` returns neutral at exactly 0; zinc text and a `–` icon; no sign | `components/portfolio-summary-card.tsx` | `/?scenario=zero` shows `– $0.00 (0.00%)` in zinc |
+  | Positive day change | emerald text, `▲`, `+$397.25 (+0.61%)` | `components/portfolio-summary-card.tsx` | `/?scenario=default` |
+  | Negative day change | red text, `▼`, `-$1,340.41 (-2.00%)`, return `-8.7%` | `components/portfolio-summary-card.tsx` | `/?scenario=negative` |
+  | Very large numbers stay legible | `Intl` thousands separators, `tabular-nums`, `text-2xl`, grid drops to 2 columns below `xl` | `components/portfolio-summary-card.tsx` | `/?scenario=large-value`: `$65,680,000,000.00`, measured `scrollWidth - clientWidth === 0` at 900px and 1440px |
+  | Negative total market value | Not handled; spec says unrealistic | — | — |
+  | Re-render when input data changes | Card is props-only with no internal state; container re-fetches on `accountId`/`scenario` change | `components/portfolio-summary.tsx` | Switching `?scenario=` updates all three figures without reload |
+  | Empty portfolio (no holdings) | Summary renders zeros, neutral styling, layout intact | `components/portfolio-summary-card.tsx` | `/?scenario=empty` |
+  | Request still in flight / failed | Container shows "Loading summary…" / "Failed to load summary: …", matching the holdings states | `components/portfolio-summary.tsx` | Observed on load; mock `fail=true` reuses the Task 3 error path |

@@ -27,3 +27,24 @@ export function formatNumber(value: number): string {
 export function formatPercent(value: number): string {
   return `${value.toFixed(2)}%`;
 }
+
+/** Format a monetary value with an explicit sign (positive gets "+"). */
+export function formatSignedCurrency(value: number, currency = "CAD"): string {
+  const formatted = getCurrencyFormatter(currency).format(Math.abs(value));
+  if (value > 0) return `+${formatted}`;
+  if (value < 0) return `-${formatted}`;
+  return formatted; // zero stays neutral ("$0.00")
+}
+
+/** Format a value already in percent units with an explicit sign: 0.61 -> "+0.61%". */
+export function formatSignedPercent(value: number): string {
+  const formatted = `${Math.abs(value).toFixed(2)}%`;
+  if (value > 0) return `+${formatted}`;
+  if (value < 0) return `-${formatted}`;
+  return formatted;
+}
+
+/** Format a ratio as a percentage: 0.187 -> "18.70%". */
+export function formatRatioPercent(value: number): string {
+  return `${(value * 100).toFixed(2)}%`;
+}

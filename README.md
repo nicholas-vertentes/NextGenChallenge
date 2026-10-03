@@ -1,3 +1,7 @@
+# The implementation is in my-app folder
+
+
+
 # Electric Mind Super Day Challenge
 
 Build a dashboard that helps someone understand their investments: what they own, how much it is all worth, and how that has changed over time.

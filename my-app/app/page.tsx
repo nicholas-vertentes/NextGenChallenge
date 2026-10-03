@@ -1,5 +1,6 @@
 import { PortfolioHoldings } from "@/components/portfolio-holdings";
 import { PortfolioAllocation } from "@/components/portfolio-allocation";
+import { PortfolioChart } from "@/components/portfolio-chart";
 
 export default async function Home(props: PageProps<"/">) {
   const { scenario } = await props.searchParams;
@@ -26,6 +27,11 @@ export default async function Home(props: PageProps<"/">) {
       >
         <h3 className="text-lg font-semibold text-zinc-900">Asset Allocation</h3>
         <PortfolioAllocation accountId="P-9001" scenario={normalizedScenario} />
+      </section>
+
+      <section aria-label="Portfolio value" className="mt-6 flex flex-col gap-3">
+        <h3 className="text-lg font-semibold text-zinc-900">Portfolio Value</h3>
+        <PortfolioChart accountId="P-9001" scenario={normalizedScenario} />
       </section>
 
       <section aria-label="Holdings" className="mt-6 flex flex-col gap-3">

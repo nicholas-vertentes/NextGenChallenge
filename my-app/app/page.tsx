@@ -4,9 +4,11 @@ import { PortfolioSummary } from "@/components/portfolio-summary";
 import { PortfolioChart } from "@/components/portfolio-chart";
 
 export default async function Home(props: PageProps<"/">) {
-  const { scenario } = await props.searchParams;
+  const { scenario, accountId } = await props.searchParams;
   const normalizedScenario =
     typeof scenario === "string" ? scenario : undefined;
+  const normalizedAccountId =
+    typeof accountId === "string" ? accountId : "P-9001";
 
   return (
     <div className="flex h-full flex-col">
@@ -16,7 +18,7 @@ export default async function Home(props: PageProps<"/">) {
 
       {/* Summary region: portfolio health at a glance. */}
       <section aria-label="Portfolio summary" className="mt-6">
-        <PortfolioSummary accountId="P-9001" scenario={normalizedScenario} />
+        <PortfolioSummary accountId={normalizedAccountId} scenario={normalizedScenario} />
       </section>
 
       <section
@@ -24,17 +26,17 @@ export default async function Home(props: PageProps<"/">) {
         className="mt-6 flex flex-col gap-3"
       >
         <h3 className="text-lg font-semibold text-zinc-900">Asset Allocation</h3>
-        <PortfolioAllocation accountId="P-9001" scenario={normalizedScenario} />
+        <PortfolioAllocation accountId={normalizedAccountId} scenario={normalizedScenario} />
       </section>
 
       <section aria-label="Portfolio value" className="mt-6 flex flex-col gap-3">
         <h3 className="text-lg font-semibold text-zinc-900">Portfolio Value</h3>
-        <PortfolioChart accountId="P-9001" scenario={normalizedScenario} />
+        <PortfolioChart accountId={normalizedAccountId} scenario={normalizedScenario} />
       </section>
 
       <section aria-label="Holdings" className="mt-6 flex flex-col gap-3">
         <h3 className="text-lg font-semibold text-zinc-900">Holdings</h3>
-        <PortfolioHoldings accountId="P-9001" scenario={normalizedScenario} />
+        <PortfolioHoldings accountId={normalizedAccountId} scenario={normalizedScenario} />
       </section>
     </div>
   );

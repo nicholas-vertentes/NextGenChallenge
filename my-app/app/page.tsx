@@ -1,6 +1,7 @@
 import { PortfolioHoldings } from "@/components/portfolio-holdings";
 import { PortfolioAllocation } from "@/components/portfolio-allocation";
 import { PortfolioChart } from "@/components/portfolio-chart";
+import { PortfolioSummary } from "@/components/portfolio-summary";
 
 export default async function Home(props: PageProps<"/">) {
   const { scenario } = await props.searchParams;
@@ -13,12 +14,8 @@ export default async function Home(props: PageProps<"/">) {
         Portfolio Overview
       </h2>
 
-      {/* Summary region: future tasks populate this with dynamic data. */}
-      <section
-        aria-label="Portfolio summary"
-        className="mt-6 rounded-lg border border-dashed border-zinc-300 bg-white p-6 text-sm text-zinc-500"
-      >
-        Portfolio summary will appear here.
+      <section aria-label="Portfolio summary" className="mt-6">
+        <PortfolioSummary accountId="P-9001" scenario={normalizedScenario} />
       </section>
 
       <section
